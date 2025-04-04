@@ -20,10 +20,9 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install dependencies with npm install
         run: |
-          npm ci
-          # Asegurarse de que terser esté instalado
+          npm install
           npm install --save-dev terser
 
       - name: Build
