@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "NODE_OPTIONS='--no-experimental-fetch' vite build",
+    "build": "NODE_OPTIONS='--no-experimental-fetch' vite build && touch dist/.nojekyll",
     "build:ci": "vite build --config vite.config.ci.js",
     "lint": "eslint . --fix || true",
     "test": "echo \"No tests specified\" && exit 0",
