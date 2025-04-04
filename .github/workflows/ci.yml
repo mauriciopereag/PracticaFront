@@ -7,54 +7,56 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '20'
+        node-version: '18'
         cache: 'npm'
     
     - name: Install dependencies
       run: npm ci
     
-    - name: Build with custom script
+    - name: Create custom build script
       run: |
-        cat <<EOT > build-ci.js
+        cat <<EOT > build-with-polyfill.js
+        // Script para proporcionar un polyfill para crypto
         const { execSync } = require('child_process');
-        const fs = require('fs');
         
-        // Polyfill para crypto
-        if (typeof global.crypto === 'undefined') {
-          global.crypto = {};
-        }
-        
-        if (typeof global.crypto.getRandomValues === 'undefined') {
-          global.crypto.getRandomValues = function(array) {
+        // Polyfill para crypto.getRandomValues
+        global.crypto = {
+          getRandomValues: function(array) {
             for (let i = 0; i < array.length; i++) {
               array[i] = Math.floor(Math.random() * 256);
             }
             return array;
-          };
+          }
+        };
+        
+        // Ejecutar Vite build
+        try {
+          console.log('Running vite build with polyfill...');
+          execSync('npx vite build', { stdio: 'inherit' });
+          console.log('Build successful!');
+          console.log('Creating .nojekyll file...');
+          require('fs').writeFileSync('dist/.nojekyll', '');
+        } catch (error) {
+          console.error('Build failed:', error);
+          process.exit(1);
         }
-        
-        // Ejecuta el build
-        execSync('npx vite build', { stdio: 'inherit' });
-        
-        // Crea el archivo .nojekyll
-        fs.writeFileSync('dist/.nojekyll', '');
         EOT
         
-        node build-ci.js
+        chmod +x build-with-polyfill.js
+    
+    - name: Build with polyfill
+      run: node build-with-polyfill.js
     
     - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@v4
+      uses: peaceiris/actions-gh-pages@v3
       with:
-        branch: gh-pages
-        folder: dist
-    
-    # Agregar pasos adicionales para despliegue si es necesario 
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist 

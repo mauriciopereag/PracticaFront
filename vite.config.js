@@ -1,33 +1,27 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
 
-// Importa el polyfill para crypto
-import './crypto-polyfill.js'
+// Simple polyfill para crypto.getRandomValues cuando se ejecuta en Node.js
+if (typeof globalThis.crypto === 'undefined' || typeof globalThis.crypto.getRandomValues !== 'function') {
+  globalThis.crypto = {
+    getRandomValues: function(array) {
+      for (let i = 0; i < array.length; i++) {
+        array[i] = Math.floor(Math.random() * 256);
+      }
+      return array;
+    }
+  };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
     base: '/PracticaFront/',
     plugins: [react()],
-    resolve: {
-        alias: {
-            '@': resolve(__dirname, 'src'),
-            crypto: resolve(__dirname, 'crypto-polyfill.js'),
-        }
-    },
     build: {
         outDir: 'dist',
-        assetsDir: 'assets',
-        rollupOptions: {
-            output: {
-                entryFileNames: 'assets/[name].[hash].js',
-                chunkFileNames: 'assets/[name].[hash].js',
-                assetFileNames: 'assets/[name].[hash].[ext]',
-                manualChunks: undefined
-            }
-        }
-    },
-    define: {
-        'crypto.getRandomValues': 'undefined'
+        // Simplificamos la configuración al mínimo
+        sourcemap: false,
+        minify: 'terser',
+        cssMinify: true
     }
 })
