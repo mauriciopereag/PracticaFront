@@ -18,7 +18,7 @@ jobs:
         node-version: '18'
         cache: 'npm'
     
-    - name: Install dependencies with npm install
+    - name: Install dependencies
       run: |
         npm install
         npm install --save-dev terser
@@ -31,40 +31,6 @@ jobs:
     
     - name: Build
       run: npm run build
-    
-    - name: Create custom build script
-      run: |
-        cat <<EOT > build-with-polyfill.js
-        // Script para proporcionar un polyfill para crypto
-        const { execSync } = require('child_process');
-        
-        // Polyfill para crypto.getRandomValues
-        global.crypto = {
-          getRandomValues: function(array) {
-            for (let i = 0; i < array.length; i++) {
-              array[i] = Math.floor(Math.random() * 256);
-            }
-            return array;
-          }
-        };
-        
-        // Ejecutar Vite build
-        try {
-          console.log('Running vite build with polyfill...');
-          execSync('npx vite build', { stdio: 'inherit' });
-          console.log('Build successful!');
-          console.log('Creating .nojekyll file...');
-          require('fs').writeFileSync('dist/.nojekyll', '');
-        } catch (error) {
-          console.error('Build failed:', error);
-          process.exit(1);
-        }
-        EOT
-        
-        chmod +x build-with-polyfill.js
-    
-    - name: Build with polyfill
-      run: node build-with-polyfill.cjs
     
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
