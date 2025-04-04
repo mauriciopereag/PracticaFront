@@ -16,20 +16,45 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18'
+        node-version: '20'
         cache: 'npm'
     
     - name: Install dependencies
       run: npm ci
     
-    - name: Lint (Non-blocking)
+    - name: Build with custom script
       run: |
-        npm run lint || echo "Lint issues found, but continuing build..."
+        cat <<EOT > build-ci.js
+        const { execSync } = require('child_process');
+        const fs = require('fs');
+        
+        // Polyfill para crypto
+        if (typeof global.crypto === 'undefined') {
+          global.crypto = {};
+        }
+        
+        if (typeof global.crypto.getRandomValues === 'undefined') {
+          global.crypto.getRandomValues = function(array) {
+            for (let i = 0; i < array.length; i++) {
+              array[i] = Math.floor(Math.random() * 256);
+            }
+            return array;
+          };
+        }
+        
+        // Ejecuta el build
+        execSync('npx vite build', { stdio: 'inherit' });
+        
+        // Crea el archivo .nojekyll
+        fs.writeFileSync('dist/.nojekyll', '');
+        EOT
+        
+        node build-ci.js
     
-    - name: Test
-      run: npm test || echo "No tests specified" && exit 0
-    
-    - name: Build in CI environment
-      run: npm run build:ci
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        branch: gh-pages
+        folder: dist
     
     # Agregar pasos adicionales para despliegue si es necesario 
