@@ -1,0 +1,5 @@
+jobs:
+  build:
+    steps:
+      - name: Run lint
+        run: npm run lint || true 

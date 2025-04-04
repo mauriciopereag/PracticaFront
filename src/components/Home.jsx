@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -17,7 +17,24 @@ const theme = createTheme({
   },
 });
 
-function Home() {
+const Home = () => {
+  const [carouselItems, setCarouselItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Ejemplo de carga de datos
+    fetch('/api/carousel-items')
+      .then(response => response.json())
+      .then(data => {
+        setCarouselItems(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error cargando datos:', error);
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <Navbar />
@@ -49,7 +66,11 @@ function Home() {
           <Typography variant="h6" component="h2" gutterBottom>
             Catálogo de Nuestros Autos
           </Typography>
-          <ImageCarousel />
+          {loading ? (
+            <p>Cargando carrusel...</p>
+          ) : (
+            <ImageCarousel items={carouselItems} />
+          )}
         </Box>
         <Typography variant="body1">
           Visítanos y encuentra el auto de tus sueños.
@@ -57,6 +78,6 @@ function Home() {
       </Box>
     </ThemeProvider>
   );
-}
+};
 
 export default Home;

@@ -2,29 +2,21 @@ import React from 'react';
 import Carousel from 'react-material-ui-carousel';
 import { Paper } from '@mui/material';
 import './ImageCarousel.css';
+import PropTypes from 'prop-types';
 
-function ImageCarousel(props) {
-    const items = [
-        {
-            name: "Porshe 911 GT3 RS",
-            image: "/assets/auto1.jpg"
-        },
-        {
-            name: "Ferrari F430",
-            image: "/assets/auto2.jpg"
-        },
-        {
-            name: "Mercedes Benz AMG GT",
-            image: "/assets/auto3.jpg"
-        }
-    ];
-
+const ImageCarousel = ({ items }) => {
+    if (!items) {
+        return <div className="carousel-container">No hay elementos para mostrar</div>;
+    }
+    
     return (
-        <Carousel>
-            {items.map((item, i) => (
-                <Item key={i} item={item} />
-            ))}
-        </Carousel>
+        <div className="carousel-container">
+            <Carousel>
+                {items.map((item, i) => (
+                    <Item key={i} item={item} />
+                ))}
+            </Carousel>
+        </div>
     );
 }
 
@@ -37,5 +29,19 @@ function Item(props) {
         </Paper>
     );
 }
+
+ImageCarousel.propTypes = {
+    items: PropTypes.arrayOf(
+        PropTypes.shape({
+            image: PropTypes.string.isRequired,
+            name: PropTypes.string.isRequired,
+            description: PropTypes.string.isRequired
+        })
+    ).isRequired
+};
+
+ImageCarousel.defaultProps = {
+    items: []
+};
 
 export default ImageCarousel;
