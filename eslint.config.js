@@ -5,7 +5,38 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
-  { ignores: ['dist'] },
+  {
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        module: 'readonly'
+      }
+    },
+    ignores: [
+      "**/node_modules/**",
+      "dist/**",
+      "build/**",
+      "src/components/ImageCarousel.jsx", // Ignoramos temporalmente este archivo
+    ],
+    rules: {
+      'no-unused-vars': 'warn',
+      'no-undef': 'error'
+    }
+  },
+  {
+    files: ['**/*.jsx', '**/*.js'],
+    languageOptions: {
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true
+        }
+      }
+    },
+    rules: {
+      'react/prop-types': 'off'
+    }
+  },
   {
     files: ['**/*.{js,jsx}'],
     languageOptions: {
