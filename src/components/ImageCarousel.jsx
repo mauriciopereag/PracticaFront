@@ -1,10 +1,9 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 import Carousel from 'react-material-ui-carousel';
 import { Paper } from '@mui/material';
 import './ImageCarousel.css';
-import PropTypes from 'prop-types';
 
-const ImageCarousel = ({ items }) => {
+const ImageCarousel = ({ items = [] }) => {
     if (!items) {
         return <div className="carousel-container">No hay elementos para mostrar</div>;
     }
@@ -37,7 +36,7 @@ ImageCarousel.propTypes = {
             name: PropTypes.string.isRequired,
             description: PropTypes.string.isRequired
         })
-    ).isRequired
+    )
 };
 
 ImageCarousel.defaultProps = {
