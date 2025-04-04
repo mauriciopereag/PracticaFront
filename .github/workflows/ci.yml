@@ -53,7 +53,7 @@ jobs:
         chmod +x build-with-polyfill.js
     
     - name: Build with polyfill
-      run: node build-with-polyfill.js
+      run: node build-with-polyfill.cjs
     
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3

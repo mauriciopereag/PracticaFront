@@ -2,16 +2,12 @@
   "name": "act2",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node build.js",
-    "build:ci": "node build-ci.js",
+    "build": "vite build && touch dist/.nojekyll",
     "lint": "eslint . || true",
     "test": "echo \"No tests specified\" && exit 0",
-    "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

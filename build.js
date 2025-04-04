@@ -3,19 +3,26 @@
 // Este script proporciona un entorno controlado para el build
 // que resuelve el problema de crypto.getRandomValues
 
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Obtener __dirname equivalente en ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Proporcionar polyfill para crypto
-global.crypto = {
-  getRandomValues: function(array) {
-    for (let i = 0; i < array.length; i++) {
-      array[i] = Math.floor(Math.random() * 256);
+if (typeof globalThis.crypto === 'undefined' || typeof globalThis.crypto.getRandomValues !== 'function') {
+  globalThis.crypto = {
+    getRandomValues: function(array) {
+      for (let i = 0; i < array.length; i++) {
+        array[i] = Math.floor(Math.random() * 256);
+      }
+      return array;
     }
-    return array;
-  }
-};
+  };
+}
 
 // Ejecutar el build con variables de entorno controladas
 try {
